@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function HomePage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
@@ -23,10 +25,10 @@ export default function HomePage() {
         <section>
           <h2 className="text-2xl font-semibold text-gray-900">Quick Links</h2>
           <ul className="mt-2 space-y-2 text-gray-700">
-            <li>• <a href="/about" className="text-blue-600 hover:underline">About the Research</a> - Background and objectives</li>
-            <li>• <a href="/methodology" className="text-blue-600 hover:underline">Methodology</a> - Research design and data collection</li>
-            <li>• <a href="/findings" className="text-blue-600 hover:underline">Findings</a> - Key results and analysis</li>
-            <li>• <a href="/dashboard" className="text-blue-600 hover:underline">Dashboard</a> - Interactive data exploration</li>
+            <li>• <Link href="/about" className="text-blue-600 hover:underline">About the Research</Link> - Background and objectives</li>
+            <li>• <Link href="/methodology" className="text-blue-600 hover:underline">Methodology</Link> - Research design and data collection</li>
+            <li>• <Link href="/findings" className="text-blue-600 hover:underline">Findings</Link> - Key results and analysis</li>
+            <li>• <Link href="/dashboard" className="text-blue-600 hover:underline">Dashboard</Link> - Interactive data exploration</li>
           </ul>
         </section>
       </div>
