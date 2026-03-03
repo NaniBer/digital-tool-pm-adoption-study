@@ -153,7 +153,28 @@ export default function DashboardPage() {
         <div className="lg:col-span-2">
           {/* Metrics Row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            {metrics.map((metric, index) => (
+            {[
+              {
+                label: 'Total Responses',
+                value: surveyData?.totalResponses?.toLocaleString() || '-',
+                live: false
+              },
+              {
+                label: 'Avg. Usefulness',
+                value: surveyData?.averageUsefulness?.toFixed(1) || '-',
+                live: false
+              },
+              {
+                label: 'Status',
+                value: loading ? 'Loading...' : error ? 'Error' : 'Active',
+                live: !loading && !error
+              },
+              {
+                label: 'Data Source',
+                value: 'Live',
+                live: true
+              },
+            ].map((metric, index) => (
               <div key={index} className="terminal-box p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="data-label">{metric.label}</div>
