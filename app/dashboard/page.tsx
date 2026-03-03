@@ -1,259 +1,285 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, LineChart, Line
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  AreaChart, Area
 } from 'recharts'
 
-// Mock questionnaire data
-const mockData = {
-  adoptionByIndustry: [
-    { industry: 'Technology', adoption: 85 },
-    { industry: 'Finance', adoption: 72 },
-    { industry: 'Healthcare', adoption: 58 },
-    { industry: 'Manufacturing', adoption: 45 },
-    { industry: 'Education', adoption: 38 },
-  ],
-  toolPreferences: [
-    { name: 'Jira', value: 35 },
-    { name: 'Asana', value: 25 },
-    { name: 'Monday.com', value: 20 },
-    { name: 'Trello', value: 12 },
-    { name: 'Other', value: 8 },
-  ],
-  adoptionTrend: [
-    { year: '2019', value: 42 },
-    { year: '2020', value: 55 },
-    { year: '2021', value: 68 },
-    { year: '2022', value: 79 },
-    { year: '2023', value: 87 },
-  ],
-  keyMetrics: [
-    { label: 'Total Respondents', value: '2,847' },
-    { label: 'Organizations Surveyed', value: '342' },
-    { label: 'Countries', value: '28' },
-    { label: 'Avg. Adoption Rate', value: '67%' },
-  ],
-}
+// Mock data
+const timelineData = [
+  { phase: 'Research Initiation', status: 'completed', date: '2024-01-15', description: 'Literature review completed' },
+  { phase: 'Data Collection', status: 'completed', date: '2024-03-01', description: 'Survey deployed to 342 orgs' },
+  { phase: 'Analysis Phase', status: 'completed', date: '2024-05-20', description: 'Quantitative analysis completed' },
+  { phase: 'Model Training', status: 'completed', date: '2024-07-10', description: 'ML models deployed' },
+  { phase: 'Validation', status: 'current', date: 'In Progress', description: 'Cross-validation running' },
+  { phase: 'Publication', status: 'pending', date: 'Pending', description: 'Final review scheduled' },
+]
 
-const COLORS = ['#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE', '#DBEAFE']
+const adoptionTrendData = [
+  { month: 'Jan', value: 42 },
+  { month: 'Feb', value: 48 },
+  { month: 'Mar', value: 55 },
+  { month: 'Apr', value: 62 },
+  { month: 'May', value: 68 },
+  { month: 'Jun', value: 79 },
+  { month: 'Jul', value: 85 },
+  { month: 'Aug', value: 87 },
+]
 
-const fadeInUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-}
+const metrics = [
+  { label: 'Accuracy', value: '98.4%', live: true },
+  { label: 'Sample Size', value: '2,847', live: false },
+  { label: 'Processing', value: 'Active', live: true },
+  { label: 'Models', value: '12', live: false },
+]
+
+const logData = [
+  { time: '14:32:01', type: 'info', message: 'Data stream initialized' },
+  { time: '14:32:02', type: 'success', message: 'Connection established: port 8080' },
+  { time: '14:32:03', type: 'info', message: 'Loading model weights...' },
+  { time: '14:32:05', type: 'success', message: 'Model loaded: 47.2MB' },
+  { time: '14:32:06', type: 'warning', message: 'High latency detected: 245ms' },
+  { time: '14:32:08', type: 'info', message: 'Optimizing batch size: 256' },
+]
 
 export default function DashboardPage() {
+  const [currentTime, setCurrentTime] = useState('')
+  const [typewriterText, setTypewriterText] = useState('')
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date()
+      setCurrentTime(now.toLocaleTimeString('en-US', { hour12: false }) + '.' + String(now.getMilliseconds()).padStart(3, '0'))
+    }
+    updateTime()
+    const interval = setInterval(updateTime, 100)
+    return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    const text = '> user_query: execute ./research_abstract.sh'
+    let i = 0
+    const interval = setInterval(() => {
+      if (i < text.length) {
+        setTypewriterText(text.slice(0, i + 1))
+        i++
+      } else {
+        clearInterval(interval)
+      }
+    }, 50)
+    return () => clearInterval(interval)
+  }, [])
+
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={{
-        visible: { transition: { staggerChildren: 0.1 } },
-      }}
-      className="min-h-screen"
-    >
-      {/* Hero Section */}
-      <motion.section
-        variants={fadeInUp}
-        className="mx-auto max-w-7xl px-6 py-16"
-      >
-        <div className="space-y-4">
-          <h1 className="font-serif text-5xl font-bold text-foreground">
-            Research Dashboard
-          </h1>
-          <p className="text-lg text-foreground-secondary max-w-3xl">
-            Explore findings from our comprehensive study on digital project management
-            adoption across industries. Interactive visualizations reveal key patterns and insights.
-          </p>
+    <div className="min-h-screen bg-terminal-bg text-terminal-text p-4 md:p-6">
+      {/* CRT Scanline Overlay */}
+      <div className="crt-overlay" />
+
+      {/* Terminal Header */}
+      <header className="mb-8 border-b border-terminal-border pb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <span className="terminal-label">[ SYSTEM.STATUS ]</span>
+            <span className="text-terminal-success pulse-glow">● ONLINE</span>
+          </div>
+          <div className="terminal-label">{currentTime}</div>
         </div>
-      </motion.section>
+      </header>
 
-      {/* Key Metrics */}
-      <motion.section variants={fadeInUp} className="mx-auto max-w-7xl px-6 pb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {mockData.keyMetrics.map((metric, index) => (
-            <motion.div
-              key={metric.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="card-hover rounded-xl border border-border bg-background-card p-6"
-            >
-              <p className="text-sm font-medium text-foreground-secondary">{metric.label}</p>
-              <p className="mt-2 text-3xl font-bold gradient-text">{metric.value}</p>
-            </motion.div>
-          ))}
+      {/* Hero Section - Terminal Command */}
+      <section className="mb-12 terminal-box p-6">
+        <div className="command-line">
+          <span className="command-prompt">$</span>
+          <span className="command-text">{typewriterText}</span>
+          <span className="cursor-blink">_</span>
         </div>
-      </motion.section>
+      </section>
 
-      {/* Charts Grid */}
-      <motion.section variants={fadeInUp} className="mx-auto max-w-7xl px-6 pb-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-          {/* Adoption by Industry - Bar Chart */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="card-hover rounded-xl border border-border bg-background-card p-6"
-          >
-            <h3 className="font-serif text-xl font-semibold text-foreground mb-6">
-              Adoption by Industry
-            </h3>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={mockData.adoptionByIndustry}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
-                  <XAxis
-                    dataKey="industry"
-                    tick={{ fill: '#a1a1aa', fontSize: 12 }}
-                    axisLine={{ stroke: '#27272a' }}
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+        {/* Left Column - Timeline */}
+        <div className="lg:col-span-1">
+          <section className="terminal-box p-6 h-full">
+            <div className="terminal-label mb-6">{'> RESEARCH.JOURNEY'}</div>
+            <div className="timeline-container">
+              <div className="timeline-line" />
+              {timelineData.map((item, index) => (
+                <div key={index} className="timeline-node">
+                  <div
+                    className={`timeline-dot ${
+                      item.status === 'completed' ? 'completed' :
+                      item.status === 'current' ? 'current' : ''
+                    }`}
                   />
-                  <YAxis
-                    tick={{ fill: '#a1a1aa', fontSize: 12 }}
-                    axisLine={{ stroke: '#27272a' }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#18181b',
-                      border: '1px solid #27272a',
-                      borderRadius: '8px',
-                      color: '#f4f4f5'
-                    }}
-                  />
-                  <Bar dataKey="adoption" fill="#3B82F6" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+                  <div className="mb-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="font-bold text-terminal-text">{item.phase}</span>
+                      {item.status === 'current' && (
+                        <div className="live-badge">
+                          <div className="live-dot"></div>
+                          LIVE
+                        </div>
+                      )}
+                    </div>
+                    <div className="terminal-label">{item.date}</div>
+                    <div className="text-terminal-muted mt-1">{item.description}</div>
+                  </div>
+                </div>
+              ))}
             </div>
-          </motion.div>
-
-          {/* Tool Preferences - Pie Chart */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 }}
-            className="card-hover rounded-xl border border-border bg-background-card p-6"
-          >
-            <h3 className="font-serif text-xl font-semibold text-foreground mb-6">
-              Tool Preferences
-            </h3>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={mockData.toolPreferences}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {mockData.toolPreferences.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#18181b',
-                      border: '1px solid #27272a',
-                      borderRadius: '8px',
-                      color: '#f4f4f5'
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </motion.div>
-
-          {/* Adoption Trend - Line Chart */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4 }}
-            className="card-hover rounded-xl border border-border bg-background-card p-6 lg:col-span-2"
-          >
-            <h3 className="font-serif text-xl font-semibold text-foreground mb-6">
-              Digital PM Adoption Trend (2019-2023)
-            </h3>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={mockData.adoptionTrend}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
-                  <XAxis
-                    dataKey="year"
-                    tick={{ fill: '#a1a1aa', fontSize: 12 }}
-                    axisLine={{ stroke: '#27272a' }}
-                  />
-                  <YAxis
-                    tick={{ fill: '#a1a1aa', fontSize: 12 }}
-                    axisLine={{ stroke: '#27272a' }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#18181b',
-                      border: '1px solid #27272a',
-                      borderRadius: '8px',
-                      color: '#f4f4f5'
-                    }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#3B82F6"
-                    strokeWidth={3}
-                    dot={{ fill: '#3B82F6', strokeWidth: 2, r: 5 }}
-                    activeDot={{ r: 7 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </motion.div>
-
+          </section>
         </div>
-      </motion.section>
 
-      {/* Key Findings Section */}
-      <motion.section variants={fadeInUp} className="mx-auto max-w-7xl px-6 pb-16">
-        <div className="rounded-xl border border-border bg-background-card p-8">
-          <h3 className="font-serif text-2xl font-semibold text-foreground mb-6">
-            Key Findings
-          </h3>
-          <div className="space-y-4 text-foreground-secondary">
-            <div className="flex items-start space-x-3">
-              <div className="mt-1 h-2 w-2 rounded-full bg-accent-primary flex-shrink-0" />
-              <p>
-                <strong className="text-foreground">Technology sector leads adoption</strong> at 85%,
-                followed by Finance at 72%.
-              </p>
+        {/* Right Columns - Bento Grid Dashboard */}
+        <div className="lg:col-span-2">
+          {/* Metrics Row */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            {metrics.map((metric, index) => (
+              <div key={index} className="terminal-box p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="data-label">{metric.label}</div>
+                  {metric.live && (
+                    <div className="live-badge">
+                      <div className="live-dot"></div>
+                      LIVE
+                    </div>
+                  )}
+                </div>
+                <div className="data-value">{metric.value}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Bento Grid */}
+          <div className="bento-grid bento-col-2">
+            {/* Live Chart */}
+            <div className="terminal-box p-6 bento-span-2">
+              <div className="flex items-center justify-between mb-4">
+                <div className="terminal-label">{'> DATA_STREAM'}</div>
+                <div className="live-badge">
+                  <div className="live-dot"></div>
+                  LIVE
+                </div>
+              </div>
+              <div className="chart-container h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={adoptionTrendData}>
+                    <defs>
+                      <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="rgba(0, 240, 255, 0.3)" />
+                        <stop offset="95%" stopColor="rgba(0, 240, 255, 0)" />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fill: '#9CA3AF', fontSize: 10 }}
+                      axisLine={{ stroke: '#1F2937' }}
+                    />
+                    <YAxis
+                      tick={{ fill: '#9CA3AF', fontSize: 10 }}
+                      axisLine={{ stroke: '#1F2937' }}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#111827',
+                        border: '1px solid #00F0FF',
+                        borderRadius: '0',
+                        color: '#FFFFFF'
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#00F0FF"
+                      strokeWidth={2}
+                      fillOpacity={1}
+                      fill="url(#chartGradient)"
+                      dot={{ fill: '#00F0FF', strokeWidth: 2, r: 4 }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
             </div>
-            <div className="flex items-start space-x-3">
-              <div className="mt-1 h-2 w-2 rounded-full bg-accent-primary flex-shrink-0" />
-              <p>
-                <strong className="text-foreground">Jira is the preferred tool</strong> with 35%
-                of respondents, followed by Asana at 25%.
-              </p>
+
+            {/* Terminal Output Log */}
+            <div className="terminal-box p-6 bento-span-2">
+              <div className="terminal-label mb-4">{'> SYSTEM.LOG'}</div>
+              <div className="space-y-2 font-mono text-sm max-h-64 overflow-y-auto">
+                {logData.map((log, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <span className="text-terminal-muted">[{log.time}]</span>
+                    <span
+                      className={
+                        log.type === 'success' ? 'text-terminal-success' :
+                        log.type === 'warning' ? 'text-terminal-warning' :
+                        'text-terminal-accent'
+                      }
+                    >
+                      {log.type.toUpperCase()}:
+                    </span>
+                    <span className="text-terminal-muted">{log.message}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="flex items-start space-x-3">
-              <div className="mt-1 h-2 w-2 rounded-full bg-accent-primary flex-shrink-0" />
-              <p>
-                <strong className="text-foreground">Rapid growth observed</strong> from 2019 to 2023,
-                with adoption rates increasing by over 100%.
-              </p>
+
+            {/* Additional Metric Card */}
+            <div className="terminal-box p-6">
+              <div className="terminal-label mb-4">{'> MODEL.STATUS'}</div>
+              <div className="space-y-4">
+                <div>
+                  <div className="data-label mb-2">Training Progress</div>
+                  <div className="w-full bg-terminal-border h-2">
+                    <div className="bg-terminal-accent h-full" style={{ width: '87%' }}></div>
+                  </div>
+                  <div className="text-right terminal-label mt-1">87%</div>
+                </div>
+                <div>
+                  <div className="data-label mb-2">Loss Rate</div>
+                  <div className="data-value text-xl text-terminal-success">0.0234</div>
+                </div>
+              </div>
             </div>
-            <div className="flex items-start space-x-3">
-              <div className="mt-1 h-2 w-2 rounded-full bg-accent-primary flex-shrink-0" />
-              <p>
-                <strong className="text-foreground">Average adoption rate</strong> across all
-                surveyed organizations stands at 67%.
-              </p>
+
+            {/* Industry Distribution */}
+            <div className="terminal-box p-6">
+              <div className="terminal-label mb-4">{'> INDUSTRY.BREAKDOWN'}</div>
+              <div className="space-y-3">
+                {[
+                  { name: 'Technology', value: 85 },
+                  { name: 'Finance', value: 72 },
+                  { name: 'Healthcare', value: 58 },
+                  { name: 'Other', value: 41 },
+                ].map((item, index) => (
+                  <div key={index}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm">{item.name}</span>
+                      <span className="text-sm text-terminal-accent">{item.value}%</span>
+                    </div>
+                    <div className="w-full bg-terminal-border h-1">
+                      <div
+                        className="bg-terminal-accent h-full"
+                        style={{ width: `${item.value}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </motion.section>
-    </motion.div>
+      </div>
+
+      {/* Footer Command Line */}
+      <footer className="terminal-box p-4">
+        <div className="command-line">
+          <span className="command-prompt">$</span>
+          <span className="command-text">awaiting_next_command...</span>
+          <span className="cursor-blink">_</span>
+        </div>
+      </footer>
+    </div>
   )
 }

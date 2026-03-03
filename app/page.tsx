@@ -1,62 +1,53 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
 
 export default function HomePage() {
+  const [buttonText, setButtonText] = useState('')
+
+  useEffect(() => {
+    const text = 'Explore the Dashboard'
+    let i = 0
+    const interval = setInterval(() => {
+      if (i < text.length) {
+        setButtonText(text.slice(0, i + 1))
+        i++
+      } else {
+        clearInterval(interval)
+      }
+    }, 100)
+    return () => clearInterval(interval)
+  }, [])
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="mx-auto max-w-7xl px-6 py-20"
-    >
-      <div className="space-y-12">
-        <section className="space-y-6">
-          <h1 className="font-serif text-5xl md:text-6xl font-bold text-foreground">
-            Digital Project Management
-            <span className="gradient-text"> Adoption Study</span>
-          </h1>
-          <p className="text-foreground-secondary max-w-3xl leading-relaxed">
-            Understanding how organizations adopt and implement digital project management tools and practices.
+    <div className="min-h-screen flex items-center justify-center px-6">
+      <div className="max-w-3xl text-center space-y-8">
+        <div className="space-y-4">
+          <p className="text-2xl md:text-3xl font-medium text-terminal-text">
+            Hi, I'm Nazrawit, Nani to most 👋🏾
           </p>
-        </section>
-
-        <section className="space-y-6">
-          <h2 className="font-serif text-3xl font-semibold text-foreground">
-            Abstract
-          </h2>
-          <p className="text-foreground-secondary max-w-3xl leading-relaxed">
-            This study examines adoption patterns of digital project management tools across various industries.
-            Through quantitative analysis of survey responses, we identify key factors influencing adoption decisions
-            and their impact on project success.
+          <p className="text-lg md:text-xl text-terminal-muted leading-relaxed">
+            My thesis explores whether project managers truly adopt digital project management tools — and what drives that decision.
           </p>
-        </section>
+          <p className="text-lg md:text-xl text-terminal-muted leading-relaxed">
+            Because downloading a tool and actually using it are two very different things.
+          </p>
+          <p className="text-lg md:text-xl text-terminal-muted leading-relaxed">
+            This platform shares the insights behind that reality.
+          </p>
+        </div>
 
-        <section className="space-y-6">
-          <h2 className="font-serif text-3xl font-semibold text-foreground">
-            Quick Links
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[
-              { href: '/about', title: 'About the Research', desc: 'Background and objectives' },
-              { href: '/methodology', title: 'Methodology', desc: 'Research design and data collection' },
-              { href: '/findings', title: 'Findings', desc: 'Key results and analysis' },
-              { href: '/dashboard', title: 'Dashboard', desc: 'Interactive data exploration' },
-            ].map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="card-hover block rounded-xl border border-border bg-background-card p-6 transition-all"
-              >
-                <h3 className="font-serif text-xl font-semibold text-accent-primary mb-2">
-                  {link.title}
-                </h3>
-                <p className="text-foreground-secondary">{link.desc}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-terminal-card border border-terminal-border font-semibold text-lg text-terminal-accent hover:border-terminal-accent hover:shadow-[0_0_20px_rgba(0,240,255,0.3)] hover:shadow-terminal-accent transition-all relative overflow-hidden group"
+        >
+          <span className="terminal-label">&gt;</span>
+          <span className="whitespace-pre">{buttonText}</span>
+          <span className="cursor-blink">_</span>
+          <div className="absolute inset-0 bg-terminal-accent/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        </Link>
       </div>
-    </motion.div>
+    </div>
   )
 }

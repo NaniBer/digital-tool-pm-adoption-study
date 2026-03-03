@@ -8,17 +8,14 @@ export function Navigation() {
 
   const navItems = [
     { name: 'Home', path: '/' },
-    { name: 'About', path: '/about' },
-    { name: 'Methodology', path: '/methodology' },
-    { name: 'Findings', path: '/findings' },
     { name: 'Dashboard', path: '/dashboard' },
   ]
 
   return (
-    <nav className="border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-50">
+    <nav className="border-b border-terminal-border bg-terminal-card/80 backdrop-blur-md sticky top-0 z-50">
       <div className="mx-auto max-w-7xl px-6 py-4">
         <div className="flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold font-serif text-foreground">
+          <Link href="/" className="text-xl font-bold font-serif text-terminal-text">
             Digital PM Adoption Study
           </Link>
           <ul className="flex space-x-6">
@@ -28,13 +25,13 @@ export function Navigation() {
                   href={item.path}
                   className={`text-sm font-medium transition-colors relative ${
                     pathname === item.path
-                      ? 'text-accent-primary'
-                      : 'text-foreground-secondary hover:text-accent-primary'
+                      ? 'text-terminal-accent'
+                      : 'text-terminal-muted hover:text-terminal-accent'
                   }`}
                 >
                   {item.name}
                   {pathname === item.path && (
-                    <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-accent-primary rounded-full" />
+                    <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-terminal-accent rounded-full" />
                   )}
                 </Link>
               </li>
