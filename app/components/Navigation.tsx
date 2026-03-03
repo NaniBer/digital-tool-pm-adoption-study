@@ -15,10 +15,10 @@ export function Navigation() {
   ]
 
   return (
-    <nav className="border-b border-gray-200 bg-white">
-      <div className="mx-auto max-w-6xl px-4 py-4">
+    <nav className="border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-50">
+      <div className="mx-auto max-w-7xl px-6 py-4">
         <div className="flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-gray-900">
+          <Link href="/" className="text-xl font-bold font-serif text-foreground">
             Digital PM Adoption Study
           </Link>
           <ul className="flex space-x-6">
@@ -26,13 +26,16 @@ export function Navigation() {
               <li key={item.path}>
                 <Link
                   href={item.path}
-                  className={`text-sm font-medium transition-colors ${
+                  className={`text-sm font-medium transition-colors relative ${
                     pathname === item.path
-                      ? 'text-blue-600'
-                      : 'text-gray-600 hover:text-blue-600'
+                      ? 'text-accent-primary'
+                      : 'text-foreground-secondary hover:text-accent-primary'
                   }`}
                 >
                   {item.name}
+                  {pathname === item.path && (
+                    <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-accent-primary rounded-full" />
+                  )}
                 </Link>
               </li>
             ))}
