@@ -21,8 +21,9 @@
   --color-terminal-accent: var(--terminal-accent);
   --color-terminal-success: var(--terminal-success);
   --color-terminal-warning: var(--terminal-warning);
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Space Mono', 'Roboto Mono', monospace;
-  --font-sans: 'Inter', 'Geist', '-apple-system', 'system-ui', sans-serif;
+  --font-mono:
+    "JetBrains Mono", "Fira Code", "Space Mono", "Roboto Mono", monospace;
+  --font-sans: "Inter", "Geist", "-apple-system", "system-ui", sans-serif;
 }
 
 body {
@@ -32,7 +33,9 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 /* Smooth scrolling */
@@ -61,8 +64,13 @@ html {
 
 /* Terminal cursor blink animation */
 @keyframes cursor-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
 .cursor-blink {
@@ -72,7 +80,8 @@ html {
 
 /* Pulse animation for live indicators */
 @keyframes pulse-glow {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     box-shadow: 0 0 8px var(--terminal-accent);
   }
@@ -88,15 +97,21 @@ html {
 
 /* Typewriter animation */
 @keyframes typewriter {
-  from { width: 0; }
-  to { width: 100%; }
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
 }
 
 .typewriter {
   overflow: hidden;
   white-space: nowrap;
   border-right: 2px solid var(--terminal-accent);
-  animation: typewriter 2s steps(40, end), cursor-blink 0.75s step-end infinite;
+  animation:
+    typewriter 2s steps(40, end),
+    cursor-blink 0.75s step-end infinite;
 }
 
 /* CRT Scanline effect */
@@ -246,12 +261,22 @@ html {
   gap: 1rem;
 }
 
-.bento-col-1 { grid-template-columns: 1fr; }
-.bento-col-2 { grid-template-columns: repeat(2, 1fr); }
-.bento-col-4 { grid-template-columns: repeat(4, 1fr); }
+.bento-col-1 {
+  grid-template-columns: 1fr;
+}
+.bento-col-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.bento-col-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
 
-.bento-span-2 { grid-column: span 2; }
-.bento-span-full { grid-column: span 1 / -1; }
+.bento-span-2 {
+  grid-column: span 2;
+}
+.bento-span-full {
+  grid-column: span 1 / -1;
+}
 
 /* Chart container */
 .chart-container {
