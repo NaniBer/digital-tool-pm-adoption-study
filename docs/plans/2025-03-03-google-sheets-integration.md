@@ -1,8 +1,8 @@
-# Google Sheets Integration Implementation Plan
+# Google Sheets Integration Implementation Plan (Basic v1)
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Connect dashboard to public Google Sheet, process survey data, and display real visualizations replacing mock data.
+**Goal:** Connect dashboard to public Google Sheet with 17 survey responses, process data, and display basic visualizations.
 
 **Architecture:** Server-side API route fetches CSV from Google Sheet, parses and aggregates data, returns JSON to dashboard component for visualization with Recharts.
 
@@ -12,19 +12,16 @@
 
 ## Context
 
-This sprint implements the Google Sheets integration design approved in `docs/plans/2025-03-03-google-sheets-integration-design.md`. The public Google Sheet contains 13 survey responses with frequency, duration, and usefulness rating columns. We'll create API routes, parsing utilities, and update the dashboard to display real data.
+This sprint implements a basic Google Sheets integration for the dashboard. The public Google Sheet contains 17 survey responses with rich data including demographics, tools, frequency, duration, and 17 Likert-scale questions.
 
-**Current Dashboard Mock Data:**
-- `timelineData` - Research phases with status (keep, this is UI content)
-- `adoptionTrendData` - Monthly adoption values (keep or repurpose)
-- `metrics` - Dashboard metrics (replace with real data)
-- `logData` - System logs (keep, this is UI content)
+**Basic v1 Scope:**
+1. Frequency distribution chart (Daily, Weekly, Monthly, Rarely, Never)
+2. Duration distribution chart (6 months - 1 year, 1-3 years, 3-5 years, etc.)
+3. Tools popularity chart (Trello, Jira, Asana, Microsoft Project, ClickUp)
+4. Total responses metric
+5. Average usefulness rating metric
 
-**New Data to Display:**
-- Frequency distribution chart
-- Duration distribution chart
-- Usefulness by frequency cross-analysis chart
-- Real metrics (total responses, average rating)
+**Data Source:** https://docs.google.com/spreadsheets/d/1D57oGe6ACimVBU7TRkXuhY_-fgVrB9HV_8QaC_m8W5g/export?format=csv
 
 ---
 
@@ -39,6 +36,15 @@ This sprint implements the Google Sheets integration design approved in `docs/pl
 // lib/types.ts
 
 export interface SurveyResponse {
+  timestamp: string
+  age: string
+  gender: string
+  education: string
+  experience: string
+  sector: string
+  position: string
+  orgSize: string
+  toolsUsed: string
   frequency: string
   duration: string
   usefulness: number
@@ -49,16 +55,11 @@ export interface DistributionItem {
   count: number
 }
 
-export interface UsefulnessByFrequency {
-  frequency: string
-  avgRating: number
-}
-
 export interface SurveyData {
   frequencyDistribution: DistributionItem[]
   durationDistribution: DistributionItem[]
+  toolsDistribution: DistributionItem[]
   averageUsefulness: number
-  usefulnessByFrequency: UsefulnessByFrequency[]
   totalResponses: number
 }
 ```
@@ -81,9 +82,9 @@ git commit -m "feat: add TypeScript types for survey data"
 
 ```typescript
 // lib/sheet-parser.ts
-import { SurveyResponse, DistributionItem, UsefulnessByFrequency, SurveyData } from './types'
+import { SurveyResponse, DistributionItem, SurveyData } from './types'
 
-const GOOGLE_SHEET_URL = process.env.GOOGLE_SHEET_URL || ''
+const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1D57oGe6ACimVBU7TRkXuhY_-fgVrB9HV_8QaC_m8W5g/export?format=csv'
 
 export async function fetchSurveyData(): Promise<SurveyData> {
   const response = await fetch(GOOGLE_SHEET_URL)
@@ -101,16 +102,30 @@ function parseCSV(csvText: string): SurveyResponse[] {
   const lines = csvText.trim().split('\n')
   const responses: SurveyResponse[] = []
 
+  // Skip header row (first line), process rest
   for (let i = 1; i < lines.length; i++) {
-    const row = lines[i].split(',')
-    if (row.length < 3) continue
+    const line = lines[i].trim()
+    if (!line || line === '') continue // Skip empty lines
 
-    const usefulness = parseInt(row[2].trim(), 10)
+    const row = line.split(',')
+    if (row.length < 11) continue
+
+    // Column 11 is "I find digital project management tools useful" (1-5 scale)
+    const usefulness = parseInt(row[11].trim(), 10)
     if (isNaN(usefulness)) continue
 
     responses.push({
-      frequency: row[0].trim(),
-      duration: row[1].trim(),
+      timestamp: row[0].trim(),
+      age: row[1].trim(),
+      gender: row[2].trim(),
+      education: row[3].trim(),
+      experience: row[4].trim(),
+      sector: row[5].trim(),
+      position: row[6].trim(),
+      orgSize: row[7].trim(),
+      toolsUsed: row[8].trim(),
+      frequency: row[9].trim(),
+      duration: row[10].trim(),
       usefulness: usefulness,
     })
   }
@@ -121,8 +136,9 @@ function parseCSV(csvText: string): SurveyResponse[] {
 function aggregateData(responses: SurveyResponse[]): SurveyData {
   const frequencyMap = new Map<string, number>()
   const durationMap = new Map<string, number>()
-  const frequencyRatings = new Map<string, number[]>()
+  const toolsMap = new Map<string, number>()
   let totalUsefulness = 0
+  let usefulCount = 0
 
   responses.forEach((response) => {
     // Aggregate frequency
@@ -133,34 +149,33 @@ function aggregateData(responses: SurveyResponse[]): SurveyData {
     const durCount = durationMap.get(response.duration) || 0
     durationMap.set(response.duration, durCount + 1)
 
-    // Aggregate usefulness by frequency
-    const ratings = frequencyRatings.get(response.frequency) || []
-    ratings.push(response.usefulness)
-    frequencyRatings.set(response.frequency, ratings)
+    // Aggregate tools (parse comma-separated list)
+    if (response.toolsUsed) {
+      const tools = response.toolsUsed.split(',').map(t => t.trim())
+      tools.forEach((tool) => {
+        const toolCount = toolsMap.get(tool) || 0
+        toolsMap.set(tool, toolCount + 1)
+      })
+    }
 
-    totalUsefulness += response.usefulness
+    // Aggregate usefulness (exclude non-users)
+    if (response.usefulness > 0) {
+      totalUsefulness += response.usefulness
+      usefulCount++
+    }
   })
 
   return {
     frequencyDistribution: mapToDistributionArray(frequencyMap),
     durationDistribution: mapToDistributionArray(durationMap),
-    averageUsefulness: responses.length > 0 ? totalUsefulness / responses.length : 0,
-    usefulnessByFrequency: calculateUsefulnessByFrequency(frequencyRatings),
+    toolsDistribution: mapToDistributionArray(toolsMap).sort((a, b) => b.count - a.count),
+    averageUsefulness: usefulCount > 0 ? totalUsefulness / usefulCount : 0,
     totalResponses: responses.length,
   }
 }
 
 function mapToDistributionArray(map: Map<string, number>): DistributionItem[] {
   return Array.from(map.entries()).map(([label, count]) => ({ label, count }))
-}
-
-function calculateUsefulnessByFrequency(ratingsMap: Map<string, number[]>): UsefulnessByFrequency[] {
-  return Array.from(ratingsMap.entries())
-    .map(([frequency, ratings]) => ({
-      frequency,
-      avgRating: ratings.reduce((sum, r) => sum + r, 0) / ratings.length,
-    }))
-    .sort((a, b) => b.avgRating - a.avgRating)
 }
 ```
 
@@ -199,20 +214,10 @@ export async function GET() {
 }
 ```
 
-**Step 2: Add environment variable reference to .env.local**
-
-```bash
-# .env.local
-GOOGLE_SHEET_URL=https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/export?format=csv
-```
-
-**Note:** User will need to replace `YOUR_SHEET_ID` with actual sheet ID.
-
-**Step 3: Commit**
+**Step 2: Commit**
 
 ```bash
 git add app/api/survey-data/route.ts
-git add .env.local 2>/dev/null || true
 git commit -m "feat: add API route for survey data"
 ```
 
@@ -270,7 +275,7 @@ git commit -m "feat: add data fetching state to dashboard"
 
 **Step 1: Update metrics section**
 
-Find the metrics section (around line 137-152) and replace with:
+Find metrics section (around line 137-152) and replace with:
 
 ```typescript
           {/* Metrics Row */}
@@ -442,35 +447,34 @@ git commit -m "feat: add duration distribution chart"
 
 ---
 
-## Task 8: Add usefulness by frequency chart
+## Task 8: Add tools popularity chart
 
 **Files:**
 - Modify: `app/dashboard/page.tsx`
 
-**Step 1: Add cross-analysis chart**
+**Step 1: Add tools chart to bento grid**
 
-Add this chart to display usefulness ratings by frequency:
+Add this chart to display tool usage popularity:
 
 ```typescript
-            {/* Usefulness by Frequency */}
+            {/* Tools Popularity */}
             <div className="terminal-box p-6">
-              <div className="terminal-label mb-4">{'> USEFULNESS.BY.FREQUENCY'}</div>
+              <div className="terminal-label mb-4">{'> TOOLS.POPULARITY'}</div>
               <div className="chart-container h-48">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={surveyData?.usefulnessByFrequency || []}>
+                  <BarChart data={surveyData?.toolsDistribution || []} layout="horizontal">
                     <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
                     <XAxis
-                      dataKey="frequency"
-                      tick={{ fill: '#9CA3AF', fontSize: 9 }}
-                      axisLine={{ stroke: '#1F2937' }}
-                      angle={-45}
-                      textAnchor="end"
-                      height={60}
-                    />
-                    <YAxis
-                      domain={[0, 5]}
+                      type="number"
                       tick={{ fill: '#9CA3AF', fontSize: 10 }}
                       axisLine={{ stroke: '#1F2937' }}
+                    />
+                    <YAxis
+                      dataKey="label"
+                      type="category"
+                      tick={{ fill: '#9CA3AF', fontSize: 9 }}
+                      axisLine={{ stroke: '#1F2937' }}
+                      width={70}
                     />
                     <Tooltip
                       contentStyle={{
@@ -480,7 +484,7 @@ Add this chart to display usefulness ratings by frequency:
                         color: '#FFFFFF'
                       }}
                     />
-                    <Bar dataKey="avgRating" fill="#FF5500" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="count" fill="#FF5500" radius={[0, 4, 4, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -491,7 +495,7 @@ Add this chart to display usefulness ratings by frequency:
 
 ```bash
 git add app/dashboard/page.tsx
-git commit -m "feat: add usefulness by frequency chart"
+git commit -m "feat: add tools popularity chart"
 ```
 
 ---
@@ -549,60 +553,30 @@ git commit -m "feat: add loading and error states"
 
 ---
 
-## Task 10: Update existing charts to show real data (optional)
-
-**Files:**
-- Modify: `app/dashboard/page.tsx`
-
-**Step 1: Replace or repurpose adoption trend chart**
-
-The existing `adoptionTrendData` mock data can either be kept or replaced with frequency data. For now, let's keep it as-is since it represents a different metric (monthly adoption trends).
-
-**Step 2: Verify all charts render**
-
-**Step 3: Commit**
-
-```bash
-git add app/dashboard/page.tsx
-git commit -m "feat: verify all charts render with real data"
-```
-
----
-
 ## Verification
 
 After completing all tasks, verify:
 
-1. **Set up environment variable:**
-   ```bash
-   # Add to .env.local
-   GOOGLE_SHEET_URL=https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/export?format=csv
-   ```
-
-2. **Start development server:**
+1. **Start development server:**
    ```bash
    npm run dev
    ```
 
-3. **Navigate to dashboard:**
+2. **Navigate to dashboard:**
    - http://localhost:3000/dashboard
 
-4. **Verify data loads:**
+3. **Verify data loads:**
    - Loading state shows briefly
-   - Real data displays in metrics
+   - Real data displays in metrics (17 total responses, average usefulness)
    - All charts render with actual survey data
 
-5. **Check specific visualizations:**
+4. **Check specific visualizations:**
    - Frequency distribution chart shows correct counts
    - Duration distribution chart shows correct counts
-   - Usefulness by frequency shows correct averages
-   - Metrics match survey data (total responses, average rating)
+   - Tools popularity shows correct tool counts
+   - Metrics match survey data
 
-6. **Test error states:**
-   - Invalid sheet URL → error message displays
-   - Network error → error message with retry button
-
-7. **Stop dev server:**
+5. **Stop dev server:**
    Press Ctrl+C
 
 ---
@@ -615,27 +589,14 @@ After completing all tasks, verify:
 | `lib/sheet-parser.ts` | CSV parsing and data aggregation utilities |
 | `app/api/survey-data/route.ts` | API route for fetching and processing data |
 | `app/dashboard/page.tsx` | Dashboard with real data integration |
-| `.env.local` | Environment variable for Google Sheet URL |
-
----
-
-## Notes for Implementation
-
-- **Google Sheet URL Format:** `https://docs.google.com/spreadsheets/d/[SHEET_ID]/export?format=csv`
-- **Replace `[SHEET_ID]`** with actual Google Sheet ID from the URL
-- **Sheet must be published** as "Anyone with the link can view" for public access
-- **Terminal styling** must be maintained across all new components
-- **Loading states** should respect the terminal aesthetic
-- **Error handling** should be user-friendly and actionable
 
 ---
 
 ## Success Criteria
 
-- Dashboard displays real data from Google Sheet
+- Dashboard displays real data from Google Sheet (17 responses)
 - All charts render correctly with aggregated data
 - Metrics accurately reflect survey responses
 - Terminal styling maintained
 - Error states handled gracefully
 - Build passes, no TypeScript errors
-- Performance acceptable (fast page load)
