@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  AreaChart, Area
+  AreaChart, Area, BarChart, Bar
 } from 'recharts'
 
 // Mock data
@@ -305,6 +305,42 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* Frequency Distribution */}
+            <div className="terminal-box p-6 bento-span-2">
+              <div className="flex items-center justify-between mb-4">
+                <div className="terminal-label">{'> USAGE.FREQUENCY'}</div>
+                <div className="live-badge">
+                  <div className="live-dot"></div>
+                  LIVE
+                </div>
+              </div>
+              <div className="chart-container h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={surveyData?.frequencyDistribution || []}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+                    <XAxis
+                      dataKey="label"
+                      tick={{ fill: '#9CA3AF', fontSize: 10 }}
+                      axisLine={{ stroke: '#1F2937' }}
+                    />
+                    <YAxis
+                      tick={{ fill: '#9CA3AF', fontSize: 10 }}
+                      axisLine={{ stroke: '#1F2937' }}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#111827',
+                        border: '1px solid #00F0FF',
+                        borderRadius: '0',
+                        color: '#FFFFFF'
+                      }}
+                    />
+                    <Bar dataKey="count" fill="#00F0FF" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </div>
