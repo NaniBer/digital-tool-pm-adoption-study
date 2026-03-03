@@ -1,4 +1,3 @@
-// lib/sheet-parser.ts
 import {
   SurveyResponse,
   DistributionItem,
@@ -32,15 +31,13 @@ function parseCSV(csvText: string): SurveyResponse[] {
   const lines = csvText.trim().split('\n')
   const responses: SurveyResponse[] = []
 
-  // Skip header row (first line), process rest
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim()
-    if (!line || line === '') continue // Skip empty lines
+    if (!line || line === '') continue
 
     const row = line.split(',')
     if (row.length < 11) continue
 
-    // Column 11 is "I find digital project management tools useful" (1-5 scale)
     const usefulness = parseInt(row[11].trim(), 10)
     if (isNaN(usefulness)) continue
 
@@ -71,15 +68,12 @@ function aggregateData(responses: SurveyResponse[]): SurveyData {
   let usefulCount = 0
 
   responses.forEach((response) => {
-    // Aggregate frequency
     const freqCount = frequencyMap.get(response.frequency) || 0
     frequencyMap.set(response.frequency, freqCount + 1)
 
-    // Aggregate duration
     const durCount = durationMap.get(response.duration) || 0
     durationMap.set(response.duration, durCount + 1)
 
-    // Aggregate tools (parse comma-separated list)
     if (response.toolsUsed) {
       const tools = response.toolsUsed.split(',').map(t => t.trim())
       tools.forEach((tool) => {
@@ -88,7 +82,6 @@ function aggregateData(responses: SurveyResponse[]): SurveyData {
       })
     }
 
-    // Aggregate usefulness (exclude non-users)
     if (response.usefulness > 0) {
       totalUsefulness += response.usefulness
       usefulCount++
