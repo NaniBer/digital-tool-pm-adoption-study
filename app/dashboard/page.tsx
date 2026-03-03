@@ -27,12 +27,6 @@ const adoptionTrendData = [
   { month: 'Aug', value: 87 },
 ]
 
-const metrics = [
-  { label: 'Accuracy', value: '98.4%', live: true },
-  { label: 'Sample Size', value: '2,847', live: false },
-  { label: 'Processing', value: 'Active', live: true },
-  { label: 'Models', value: '12', live: false },
-]
 
 const logData = [
   { time: '14:32:01', type: 'info', message: 'Data stream initialized' },
@@ -46,6 +40,9 @@ const logData = [
 export default function DashboardPage() {
   const [currentTime, setCurrentTime] = useState('')
   const [typewriterText, setTypewriterText] = useState('')
+  const [surveyData, setSurveyData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const updateTime = () => {
@@ -55,6 +52,27 @@ export default function DashboardPage() {
     updateTime()
     const interval = setInterval(updateTime, 100)
     return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true)
+        const response = await fetch('/api/survey-data')
+        if (!response.ok) {
+          throw new Error('Failed to fetch data')
+        }
+        const data = await response.json()
+        setSurveyData(data)
+      } catch (err) {
+        console.error('Error fetching survey data:', err)
+        setError('Failed to load survey data')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
   }, [])
 
   useEffect(() => {
