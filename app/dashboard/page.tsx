@@ -343,6 +343,44 @@ export default function DashboardPage() {
                 </ResponsiveContainer>
               </div>
             </div>
+
+            {/* Duration Distribution */}
+            <div className="terminal-box p-6 bento-span-2">
+              <div className="flex items-center justify-between mb-4">
+                <div className="terminal-label">{'> USAGE.DURATION'}</div>
+                <div className="live-badge">
+                  <div className="live-dot"></div>
+                  LIVE
+                </div>
+              </div>
+              <div className="chart-container h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={surveyData?.durationDistribution || []} layout="horizontal">
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+                    <XAxis type="number" tick={{ fill: '#9CA3AF', fontSize: 10 }} axisLine={{ stroke: '#1F2937' }} />
+                    <YAxis dataKey="label" type="category" tick={{ fill: '#9CA3AF', fontSize: 10 }} axisLine={{ stroke: '#1F2937' }} width={80} />
+                    <Tooltip contentStyle={{ backgroundColor: '#111827', border: '1px solid #00F0FF', borderRadius: '0', color: '#FFFFFF' }} />
+                    <Bar dataKey="count" fill="#00FF41" radius={[0, 4, 4, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Tools Popularity */}
+            <div className="terminal-box p-6 bento-span-2">
+              <div className="terminal-label mb-4">{'> TOOLS.POPULARITY'}</div>
+              <div className="chart-container h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={surveyData?.toolsDistribution || []} layout="horizontal">
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+                    <XAxis type="number" tick={{ fill: '#9CA3AF', fontSize: 10 }} axisLine={{ stroke: '#1F2937' }} />
+                    <YAxis dataKey="label" type="category" tick={{ fill: '#9CA3AF', fontSize: 9 }} axisLine={{ stroke: '#1F2937' }} width={70} />
+                    <Tooltip contentStyle={{ backgroundColor: '#111827', border: '1px solid #00F0FF', borderRadius: '0', color: '#FFFFFF' }} />
+                    <Bar dataKey="count" fill="#FF5500" radius={[0, 4, 4, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
           </div>
         </div>
       </div>
