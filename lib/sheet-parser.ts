@@ -100,8 +100,11 @@ function aggregateData(responses: SurveyResponse[]): SurveyData {
     const freqCount = frequencyMap.get(response.frequency) || 0
     frequencyMap.set(response.frequency, freqCount + 1)
 
-    const durCount = durationMap.get(response.duration) || 0
-    durationMap.set(response.duration, durCount + 1)
+    // Only count duration if it's not empty and is a valid duration value
+    if (response.duration && response.duration.trim() !== '') {
+      const durCount = durationMap.get(response.duration) || 0
+      durationMap.set(response.duration, durCount + 1)
+    }
 
     if (response.toolsUsed) {
       const tools = response.toolsUsed.split(',').map(t => t.trim())
