@@ -2,6 +2,7 @@ import {
   SurveyResponse,
   DistributionItem,
   SurveyData,
+  ResponseAccumulation,
   AgeRange,
   Gender,
   EducationLevel,
@@ -92,9 +93,52 @@ function aggregateData(responses: SurveyResponse[]): SurveyData {
     frequencyDistribution: mapToDistributionArray(frequencyMap),
     durationDistribution: mapToDistributionArray(durationMap),
     toolsDistribution: mapToDistributionArray(toolsMap).sort((a, b) => b.count - a.count),
+    responseAccumulation: computeResponseAccumulation(responses),
     averageUsefulness: usefulCount > 0 ? totalUsefulness / usefulCount : 0,
     totalResponses: responses.length,
   }
+}
+
+function computeResponseAccumulation(responses: SurveyResponse[]): ResponseAccumulation[] {
+  // Group responses by month (format: "M/YYYY")
+  const monthMap = new Map<string, number>()
+
+  responses.forEach((response) => {
+    const date = parseTimestamp(response.timestamp)
+    const monthKey = `${date.getMonth() + 1}/${date.getFullYear()}`
+    const count = monthMap.get(monthKey) || 0
+    monthMap.set(monthKey, count + 1)
+  })
+
+  // Sort chronologically and compute cumulative count
+  const sortedMonths = Array.from(monthMap.entries()).sort((a, b) => {
+    const [monthA, yearA] = a[0].split('/').map(Number)
+    const [monthB, yearB] = b[0].split('/').map(Number)
+    return yearA !== yearB ? yearA - yearB : monthA - monthB
+  })
+
+  let cumulative = 0
+  const result: ResponseAccumulation[] = []
+
+  sortedMonths.forEach(([month, count]) => {
+    cumulative += count
+    result.push({ date: month, count: cumulative })
+  })
+
+  return result
+}
+
+function parseTimestamp(timestamp: string): Date {
+  // Expected format: "M/D/YYYY HH:MM:SS" or "M/D/YY HH:MM:SS"
+  const [datePart, timePart] = timestamp.split(' ')
+  if (!datePart) return new Date()
+
+  const [month, day, year] = datePart.split('/').map(Number)
+
+  // Handle 2-digit years (e.g., "26" -> 2026, "25" -> 2025)
+  const fullYear = year < 100 ? 2000 + year : year
+
+  return new Date(fullYear, month - 1, day)
 }
 
 function mapToDistributionArray(map: Map<string, number>): DistributionItem[] {
