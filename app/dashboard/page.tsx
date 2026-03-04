@@ -1,82 +1,178 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from "react";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  AreaChart, Area, BarChart, Bar
-} from 'recharts'
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+} from "recharts";
 
 // Mock data
 const timelineData = [
-  { phase: 'Research Initiation', status: 'completed', date: '2024-01-15', description: 'Literature review completed' },
-  { phase: 'Data Collection', status: 'completed', date: '2024-03-01', description: 'Survey deployed to 342 orgs' },
-  { phase: 'Analysis Phase', status: 'completed', date: '2024-05-20', description: 'Quantitative analysis completed' },
-  { phase: 'Model Training', status: 'completed', date: '2024-07-10', description: 'ML models deployed' },
-  { phase: 'Validation', status: 'current', date: 'In Progress', description: 'Cross-validation running' },
-  { phase: 'Publication', status: 'pending', date: 'Pending', description: 'Final review scheduled' },
-]
-
+  {
+    phase: "Research Initiation",
+    status: "completed",
+    date: "2024-01-15",
+    description: "Literature review completed",
+  },
+  {
+    phase: "Data Collection",
+    status: "completed",
+    date: "2024-03-01",
+    description: "Survey deployed to 342 orgs",
+  },
+  {
+    phase: "Analysis Phase",
+    status: "completed",
+    date: "2024-05-20",
+    description: "Quantitative analysis completed",
+  },
+  {
+    phase: "Model Training",
+    status: "completed",
+    date: "2024-07-10",
+    description: "ML models deployed",
+  },
+  {
+    phase: "Validation",
+    status: "current",
+    date: "In Progress",
+    description: "Cross-validation running",
+  },
+  {
+    phase: "Publication",
+    status: "pending",
+    date: "Pending",
+    description: "Final review scheduled",
+  },
+];
 
 const logData = [
-  { time: '14:32:01', type: 'info', message: 'Data stream initialized' },
-  { time: '14:32:02', type: 'success', message: 'Connection established: port 8080' },
-  { time: '14:32:03', type: 'info', message: 'Loading model weights...' },
-  { time: '14:32:05', type: 'success', message: 'Model loaded: 47.2MB' },
-  { time: '14:32:06', type: 'warning', message: 'High latency detected: 245ms' },
-  { time: '14:32:08', type: 'info', message: 'Optimizing batch size: 256' },
-]
+  { time: "14:32:01", type: "info", message: "Survey system online" },
+  { time: "14:32:04", type: "success", message: "Response collector active" },
+  {
+    time: "14:32:06",
+    type: "warning",
+    message: "Data confidence low — more responses needed",
+  },
+  {
+    time: "14:32:10",
+    type: "warning",
+    message: "Response latency spike detected",
+  },
+  {
+    time: "14:32:13",
+    type: "info",
+    message: "System waiting for new submissions",
+  },
+];
+
+// Generate dynamic survey logs from real data
+function generateSurveyLogs(surveyData: any) {
+  if (!surveyData) return [];
+
+  const logs = [];
+  const now = new Date();
+  const timeBase = now.toTimeString();
+
+  logs.push({
+    time: timeBase,
+    type: "info",
+    message: "Survey collection started",
+  });
+
+  logs.push({
+    time: timeBase,
+    type: "success",
+    message: `Total responses: ${surveyData.totalResponses}`,
+  });
+
+  if (surveyData.latestResponseDate) {
+    logs.push({
+      time: timeBase,
+      type: "success",
+      message: `Latest response: ${surveyData.latestResponseDate}`,
+    });
+  }
+
+  if (surveyData.dataQualityMessage) {
+    const messageType =
+      surveyData.dataQualityMessage === "Need more data"
+        ? "warning"
+        : "success";
+    logs.push({
+      time: timeBase,
+      type: messageType,
+      message: `Data quality: ${surveyData.dataQualityMessage}`,
+    });
+  }
+
+  return logs;
+}
 
 export default function DashboardPage() {
-  const [currentTime, setCurrentTime] = useState('')
-  const [typewriterText, setTypewriterText] = useState('')
-  const [surveyData, setSurveyData] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [currentTime, setCurrentTime] = useState("");
+  const [typewriterText, setTypewriterText] = useState("");
+  const [surveyData, setSurveyData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const updateTime = () => {
-      const now = new Date()
-      setCurrentTime(now.toLocaleTimeString('en-US', { hour12: false }) + '.' + String(now.getMilliseconds()).padStart(3, '0'))
-    }
-    updateTime()
-    const interval = setInterval(updateTime, 100)
-    return () => clearInterval(interval)
-  }, [])
+      const now = new Date();
+      setCurrentTime(
+        now.toLocaleTimeString("en-US", { hour12: false }) +
+          "." +
+          String(now.getMilliseconds()).padStart(3, "0"),
+      );
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 100);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        setLoading(true)
-        const response = await fetch('/api/survey-data')
+        setLoading(true);
+        const response = await fetch("/api/survey-data");
         if (!response.ok) {
-          throw new Error('Failed to fetch data')
+          throw new Error("Failed to fetch data");
         }
-        const data = await response.json()
-        setSurveyData(data)
+        const data = await response.json();
+        setSurveyData(data);
       } catch (err) {
-        console.error('Error fetching survey data:', err)
-        setError('Failed to load survey data')
+        console.error("Error fetching survey data:", err);
+        setError("Failed to load survey data");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
 
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   useEffect(() => {
-    const text = '> user_query: execute ./research_abstract.sh'
-    let i = 0
+    const text = "> user_query: execute ./research_abstract.sh";
+    let i = 0;
     const interval = setInterval(() => {
       if (i < text.length) {
-        setTypewriterText(text.slice(0, i + 1))
-        i++
+        setTypewriterText(text.slice(0, i + 1));
+        i++;
       } else {
-        clearInterval(interval)
+        clearInterval(interval);
       }
-    }, 50)
-    return () => clearInterval(interval)
-  }, [])
+    }, 50);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen bg-terminal-bg text-terminal-text p-4 md:p-6">
@@ -107,7 +203,7 @@ export default function DashboardPage() {
       {loading && (
         <div className="terminal-box p-6 mb-8">
           <div className="text-center">
-            <div className="terminal-label mb-4">{'> SYSTEM.STATUS'}</div>
+            <div className="terminal-label mb-4">{"> SYSTEM.STATUS"}</div>
             <div className="flex items-center justify-center gap-2">
               <span className="text-terminal-accent">Loading data...</span>
               <span className="cursor-blink">_</span>
@@ -118,10 +214,18 @@ export default function DashboardPage() {
 
       {/* Error State */}
       {error && (
-        <div className="terminal-box p-6 mb-8" style={{ borderColor: 'var(--terminal-warning)' }}>
+        <div
+          className="terminal-box p-6 mb-8"
+          style={{ borderColor: "var(--terminal-warning)" }}
+        >
           <div className="text-center">
-            <div className="terminal-label mb-4" style={{ color: 'var(--terminal-warning)' }}>{'> SYSTEM.ERROR'}</div>
-            <p style={{ color: 'var(--terminal-warning)' }}>{error}</p>
+            <div
+              className="terminal-label mb-4"
+              style={{ color: "var(--terminal-warning)" }}
+            >
+              {"> SYSTEM.ERROR"}
+            </div>
+            <p style={{ color: "var(--terminal-warning)" }}>{error}</p>
             <button
               onClick={() => window.location.reload()}
               className="mt-4 px-4 py-2 border border-terminal-accent text-terminal-accent hover:bg-terminal-accent/10 transition-colors"
@@ -137,21 +241,26 @@ export default function DashboardPage() {
         {/* Left Column - Timeline */}
         <div className="lg:col-span-1">
           <section className="terminal-box p-6 h-full">
-            <div className="terminal-label mb-6">{'> RESEARCH.JOURNEY'}</div>
+            <div className="terminal-label mb-6">{"> RESEARCH.JOURNEY"}</div>
             <div className="timeline-container">
               <div className="timeline-line" />
               {timelineData.map((item, index) => (
                 <div key={index} className="timeline-node">
                   <div
                     className={`timeline-dot ${
-                      item.status === 'completed' ? 'completed' :
-                      item.status === 'current' ? 'current' : ''
+                      item.status === "completed"
+                        ? "completed"
+                        : item.status === "current"
+                          ? "current"
+                          : ""
                     }`}
                   />
                   <div className="mb-4">
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="font-bold text-terminal-text">{item.phase}</span>
-                      {item.status === 'current' && (
+                      <span className="font-bold text-terminal-text">
+                        {item.phase}
+                      </span>
+                      {item.status === "current" && (
                         <div className="live-badge">
                           <div className="live-dot"></div>
                           LIVE
@@ -159,7 +268,9 @@ export default function DashboardPage() {
                       )}
                     </div>
                     <div className="terminal-label">{item.date}</div>
-                    <div className="text-terminal-muted mt-1">{item.description}</div>
+                    <div className="text-terminal-muted mt-1">
+                      {item.description}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -173,24 +284,24 @@ export default function DashboardPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             {[
               {
-                label: 'Total Responses',
-                value: surveyData?.totalResponses?.toLocaleString() || '-',
-                live: false
+                label: "Total Responses",
+                value: surveyData?.totalResponses?.toLocaleString() || "-",
+                live: false,
               },
               {
-                label: 'Avg. Usefulness',
-                value: surveyData?.averageUsefulness?.toFixed(1) || '-',
-                live: false
+                label: "Avg. Usefulness",
+                value: surveyData?.averageUsefulness?.toFixed(1) || "-",
+                live: false,
               },
               {
-                label: 'Status',
-                value: loading ? 'Loading...' : error ? 'Error' : 'Active',
-                live: !loading && !error
+                label: "Status",
+                value: loading ? "Loading..." : error ? "Error" : "Active",
+                live: !loading && !error,
               },
               {
-                label: 'Data Source',
-                value: 'Live',
-                live: true
+                label: "Data Source",
+                value: "Live",
+                live: true,
               },
             ].map((metric, index) => (
               <div key={index} className="terminal-box p-4">
@@ -213,7 +324,7 @@ export default function DashboardPage() {
             {/* Live Chart */}
             <div className="terminal-box p-6 bento-span-2">
               <div className="flex items-center justify-between mb-4">
-                <div className="terminal-label">{'> DATA_STREAM'}</div>
+                <div className="terminal-label">{"> DATA_STREAM"}</div>
                 <div className="live-badge">
                   <div className="live-dot"></div>
                   LIVE
@@ -223,7 +334,13 @@ export default function DashboardPage() {
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={surveyData?.responseAccumulation || []}>
                     <defs>
-                      <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                      <linearGradient
+                        id="chartGradient"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
                         <stop offset="5%" stopColor="rgba(0, 240, 255, 0.3)" />
                         <stop offset="95%" stopColor="rgba(0, 240, 255, 0)" />
                       </linearGradient>
@@ -231,19 +348,19 @@ export default function DashboardPage() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
                     <XAxis
                       dataKey="date"
-                      tick={{ fill: '#9CA3AF', fontSize: 10 }}
-                      axisLine={{ stroke: '#1F2937' }}
+                      tick={{ fill: "#9CA3AF", fontSize: 10 }}
+                      axisLine={{ stroke: "#1F2937" }}
                     />
                     <YAxis
-                      tick={{ fill: '#9CA3AF', fontSize: 10 }}
-                      axisLine={{ stroke: '#1F2937' }}
+                      tick={{ fill: "#9CA3AF", fontSize: 10 }}
+                      axisLine={{ stroke: "#1F2937" }}
                     />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: '#111827',
-                        border: '1px solid #00F0FF',
-                        borderRadius: '0',
-                        color: '#FFFFFF'
+                        backgroundColor: "#111827",
+                        border: "1px solid #00F0FF",
+                        borderRadius: "0",
+                        color: "#FFFFFF",
                       }}
                     />
                     <Area
@@ -253,7 +370,7 @@ export default function DashboardPage() {
                       strokeWidth={2}
                       fillOpacity={1}
                       fill="url(#chartGradient)"
-                      dot={{ fill: '#00F0FF', strokeWidth: 2, r: 4 }}
+                      dot={{ fill: "#00F0FF", strokeWidth: 2, r: 4 }}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -262,16 +379,18 @@ export default function DashboardPage() {
 
             {/* Terminal Output Log */}
             <div className="terminal-box p-6 bento-span-2">
-              <div className="terminal-label mb-4">{'> SYSTEM.LOG'}</div>
+              <div className="terminal-label mb-4">{"> SYSTEM.LOG"}</div>
               <div className="space-y-2 font-mono text-sm max-h-64 overflow-y-auto">
                 {logData.map((log, index) => (
                   <div key={index} className="flex items-start gap-3">
                     <span className="text-terminal-muted">[{log.time}]</span>
                     <span
                       className={
-                        log.type === 'success' ? 'text-terminal-success' :
-                        log.type === 'warning' ? 'text-terminal-warning' :
-                        'text-terminal-accent'
+                        log.type === "success"
+                          ? "text-terminal-success"
+                          : log.type === "warning"
+                            ? "text-terminal-warning"
+                            : "text-terminal-accent"
                       }
                     >
                       {log.type.toUpperCase()}:
@@ -284,52 +403,69 @@ export default function DashboardPage() {
 
             {/* Additional Metric Card */}
             <div className="terminal-box p-6">
-              <div className="terminal-label mb-4">{'> MODEL.STATUS'}</div>
+              <div className="terminal-label mb-4">{"> MODEL.STATUS"}</div>
               <div className="space-y-4">
                 <div>
-                  <div className="data-label mb-2">Training Progress</div>
+                  <div className="data-label mb-2">Survey Progress</div>
                   <div className="w-full bg-terminal-border h-2">
-                    <div className="bg-terminal-accent h-full" style={{ width: '87%' }}></div>
+                    <div
+                      className="bg-terminal-accent h-full"
+                      style={{
+                        width: `${surveyData?.progressPercentage || 0}%`,
+                      }}
+                    ></div>
                   </div>
-                  <div className="text-right terminal-label mt-1">87%</div>
+                  <div className="text-right terminal-label mt-1">
+                    {surveyData?.progressPercentage || 0}%
+                  </div>
                 </div>
                 <div>
-                  <div className="data-label mb-2">Loss Rate</div>
-                  <div className="data-value text-xl text-terminal-success">0.0234</div>
+                  <div className="data-label mb-2">Responses Collected</div>
+                  <div className="data-value text-xl text-terminal-success">
+                    {surveyData?.totalResponses || 0} / 150
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Industry Distribution */}
             <div className="terminal-box p-6">
-              <div className="terminal-label mb-4">{'> INDUSTRY.BREAKDOWN'}</div>
+              <div className="terminal-label mb-4">
+                {"> INDUSTRY.BREAKDOWN"}
+              </div>
               <div className="space-y-3">
-                {(surveyData?.sectorDistribution || []).map((item: { label: string; count: number }, index: number) => {
-                  const percentage = surveyData?.totalResponses
-                    ? Math.round((item.count / surveyData.totalResponses) * 100)
-                    : 0
-                  return (
-                    <div key={index}>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm">{item.label}</span>
-                        <span className="text-sm text-terminal-accent">{percentage}%</span>
+                {(surveyData?.sectorDistribution || []).map(
+                  (item: { label: string; count: number }, index: number) => {
+                    const percentage = surveyData?.totalResponses
+                      ? Math.round(
+                          (item.count / surveyData.totalResponses) * 100,
+                        )
+                      : 0;
+                    return (
+                      <div key={index}>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm">{item.label}</span>
+                          <span className="text-sm text-terminal-accent">
+                            {percentage}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-terminal-border h-1">
+                          <div
+                            className="bg-terminal-accent h-full"
+                            style={{ width: `${percentage}%` }}
+                          ></div>
+                        </div>
                       </div>
-                      <div className="w-full bg-terminal-border h-1">
-                        <div
-                          className="bg-terminal-accent h-full"
-                          style={{ width: `${percentage}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  )
-                })}
+                    );
+                  },
+                )}
               </div>
             </div>
 
             {/* Frequency Distribution */}
             <div className="terminal-box p-6 bento-span-2">
               <div className="flex items-center justify-between mb-4">
-                <div className="terminal-label">{'> USAGE.FREQUENCY'}</div>
+                <div className="terminal-label">{"> USAGE.FREQUENCY"}</div>
                 <div className="live-badge">
                   <div className="live-dot"></div>
                   LIVE
@@ -341,19 +477,19 @@ export default function DashboardPage() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
                     <XAxis
                       dataKey="label"
-                      tick={{ fill: '#9CA3AF', fontSize: 10 }}
-                      axisLine={{ stroke: '#1F2937' }}
+                      tick={{ fill: "#9CA3AF", fontSize: 10 }}
+                      axisLine={{ stroke: "#1F2937" }}
                     />
                     <YAxis
-                      tick={{ fill: '#9CA3AF', fontSize: 10 }}
-                      axisLine={{ stroke: '#1F2937' }}
+                      tick={{ fill: "#9CA3AF", fontSize: 10 }}
+                      axisLine={{ stroke: "#1F2937" }}
                     />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: '#111827',
-                        border: '1px solid #00F0FF',
-                        borderRadius: '0',
-                        color: '#FFFFFF'
+                        backgroundColor: "#111827",
+                        border: "1px solid #00F0FF",
+                        borderRadius: "0",
+                        color: "#FFFFFF",
                       }}
                     />
                     <Bar dataKey="count" fill="#00F0FF" radius={[4, 4, 0, 0]} />
@@ -365,7 +501,7 @@ export default function DashboardPage() {
             {/* Duration Distribution */}
             <div className="terminal-box p-6 bento-span-2">
               <div className="flex items-center justify-between mb-4">
-                <div className="terminal-label">{'> USAGE.DURATION'}</div>
+                <div className="terminal-label">{"> USAGE.DURATION"}</div>
                 <div className="live-badge">
                   <div className="live-dot"></div>
                   LIVE
@@ -377,19 +513,19 @@ export default function DashboardPage() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
                     <XAxis
                       dataKey="label"
-                      tick={{ fill: '#9CA3AF', fontSize: 9 }}
-                      axisLine={{ stroke: '#1F2937' }}
+                      tick={{ fill: "#9CA3AF", fontSize: 9 }}
+                      axisLine={{ stroke: "#1F2937" }}
                     />
                     <YAxis
-                      tick={{ fill: '#9CA3AF', fontSize: 10 }}
-                      axisLine={{ stroke: '#1F2937' }}
+                      tick={{ fill: "#9CA3AF", fontSize: 10 }}
+                      axisLine={{ stroke: "#1F2937" }}
                     />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: '#111827',
-                        border: '1px solid #00F0FF',
-                        borderRadius: '0',
-                        color: '#FFFFFF'
+                        backgroundColor: "#111827",
+                        border: "1px solid #00F0FF",
+                        borderRadius: "0",
+                        color: "#FFFFFF",
                       }}
                     />
                     <Bar dataKey="count" fill="#00FF41" radius={[4, 4, 0, 0]} />
@@ -400,21 +536,28 @@ export default function DashboardPage() {
 
             {/* Tools Popularity */}
             <div className="terminal-box p-6 bento-span-2">
-              <div className="terminal-label mb-4">{'> TOOLS.POPULARITY'}</div>
+              <div className="terminal-label mb-4">{"> TOOLS.POPULARITY"}</div>
               <div className="chart-container h-48">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={surveyData?.toolsDistribution || []}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
                     <XAxis
                       dataKey="label"
-                      tick={{ fill: '#9CA3AF', fontSize: 8 }}
-                      axisLine={{ stroke: '#1F2937' }}
+                      tick={{ fill: "#9CA3AF", fontSize: 8 }}
+                      axisLine={{ stroke: "#1F2937" }}
                     />
                     <YAxis
-                      tick={{ fill: '#9CA3AF', fontSize: 10 }}
-                      axisLine={{ stroke: '#1F2937' }}
+                      tick={{ fill: "#9CA3AF", fontSize: 10 }}
+                      axisLine={{ stroke: "#1F2937" }}
                     />
-                    <Tooltip contentStyle={{ backgroundColor: '#111827', border: '1px solid #00F0FF', borderRadius: '0', color: '#FFFFFF' }} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#111827",
+                        border: "1px solid #00F0FF",
+                        borderRadius: "0",
+                        color: "#FFFFFF",
+                      }}
+                    />
                     <Bar dataKey="count" fill="#FF5500" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -433,5 +576,5 @@ export default function DashboardPage() {
         </div>
       </footer>
     </div>
-  )
+  );
 }

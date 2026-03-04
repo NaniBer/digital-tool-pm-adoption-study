@@ -10,6 +10,7 @@
   --terminal-accent: #00f0ff;
   --terminal-success: #00ff41;
   --terminal-warning: #ff5500;
+  --terminal-error: #ff4444;
 }
 
 @theme inline {
@@ -21,6 +22,7 @@
   --color-terminal-accent: var(--terminal-accent);
   --color-terminal-success: var(--terminal-success);
   --color-terminal-warning: var(--terminal-warning);
+  --color-terminal-error: var(--terminal-error);
   --font-mono:
     "JetBrains Mono", "Fira Code", "Space Mono", "Roboto Mono", monospace;
   --font-sans: "Inter", "Geist", "-apple-system", "system-ui", sans-serif;
