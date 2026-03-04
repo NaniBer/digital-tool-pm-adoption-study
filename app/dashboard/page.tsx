@@ -304,25 +304,25 @@ export default function DashboardPage() {
             <div className="terminal-box p-6">
               <div className="terminal-label mb-4">{'> INDUSTRY.BREAKDOWN'}</div>
               <div className="space-y-3">
-                {[
-                  { name: 'Technology', value: 85 },
-                  { name: 'Finance', value: 72 },
-                  { name: 'Healthcare', value: 58 },
-                  { name: 'Other', value: 41 },
-                ].map((item, index) => (
-                  <div key={index}>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm">{item.name}</span>
-                      <span className="text-sm text-terminal-accent">{item.value}%</span>
+                {(surveyData?.sectorDistribution || []).map((item: { label: string; count: number }, index: number) => {
+                  const percentage = surveyData?.totalResponses
+                    ? Math.round((item.count / surveyData.totalResponses) * 100)
+                    : 0
+                  return (
+                    <div key={index}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm">{item.label}</span>
+                        <span className="text-sm text-terminal-accent">{percentage}%</span>
+                      </div>
+                      <div className="w-full bg-terminal-border h-1">
+                        <div
+                          className="bg-terminal-accent h-full"
+                          style={{ width: `${percentage}%` }}
+                        ></div>
+                      </div>
                     </div>
-                    <div className="w-full bg-terminal-border h-1">
-                      <div
-                        className="bg-terminal-accent h-full"
-                        style={{ width: `${item.value}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
 

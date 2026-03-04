@@ -114,6 +114,8 @@ export interface SurveyData {
   durationDistribution: DistributionItem[]
   /** Popularity distribution of tools mentioned in responses */
   toolsDistribution: DistributionItem[]
+  /** Distribution of industry sectors across all responses */
+  sectorDistribution: DistributionItem[]
   /** Response accumulation over time (cumulative total responses) */
   responseAccumulation: ResponseAccumulation[]
   /** Average usefulness rating (1-5 scale) from all non-zero responses */

@@ -93,6 +93,7 @@ function aggregateData(responses: SurveyResponse[]): SurveyData {
   const frequencyMap = new Map<string, number>()
   const durationMap = new Map<string, number>()
   const toolsMap = new Map<string, number>()
+  const sectorMap = new Map<string, number>()
   let totalUsefulness = 0
   let usefulCount = 0
 
@@ -114,6 +115,10 @@ function aggregateData(responses: SurveyResponse[]): SurveyData {
       })
     }
 
+    // Aggregate sector
+    const sectorCount = sectorMap.get(response.sector) || 0
+    sectorMap.set(response.sector, sectorCount + 1)
+
     if (response.usefulness > 0) {
       totalUsefulness += response.usefulness
       usefulCount++
@@ -124,6 +129,7 @@ function aggregateData(responses: SurveyResponse[]): SurveyData {
     frequencyDistribution: mapToDistributionArray(frequencyMap),
     durationDistribution: mapToDistributionArray(durationMap),
     toolsDistribution: mapToDistributionArray(toolsMap).sort((a, b) => b.count - a.count),
+    sectorDistribution: mapToDistributionArray(sectorMap).sort((a, b) => b.count - a.count),
     responseAccumulation: computeResponseAccumulation(responses),
     averageUsefulness: usefulCount > 0 ? totalUsefulness / usefulCount : 0,
     totalResponses: responses.length,
