@@ -1,24 +1,24 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
+import { useState, useEffect } from "react";
+import Link from "next/link";
 
 export default function HomePage() {
-  const [buttonText, setButtonText] = useState('')
+  const [buttonText, setButtonText] = useState("");
 
   useEffect(() => {
-    const text = 'Explore the Dashboard'
-    let i = 0
+    const text = "Explore the Dashboard";
+    let i = 0;
     const interval = setInterval(() => {
       if (i < text.length) {
-        setButtonText(text.slice(0, i + 1))
-        i++
+        setButtonText(text.slice(0, i + 1));
+        i++;
       } else {
-        clearInterval(interval)
+        clearInterval(interval);
       }
-    }, 100)
-    return () => clearInterval(interval)
-  }, [])
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center px-6">
@@ -28,10 +28,12 @@ export default function HomePage() {
             Hi, I'm Nazrawit, Nani to most 👋🏾
           </p>
           <p className="text-lg md:text-xl text-terminal-muted leading-relaxed">
-            My thesis explores whether project managers truly adopt digital project management tools — and what drives that decision.
+            My thesis explores whether project managers truly adopt digital
+            project management tools, and what drives that decision.
           </p>
           <p className="text-lg md:text-xl text-terminal-muted leading-relaxed">
-            Because downloading a tool and actually using it are two very different things.
+            Because downloading a tool and actually using it are two very
+            different things.
           </p>
           <p className="text-lg md:text-xl text-terminal-muted leading-relaxed">
             This platform shares the insights behind that reality.
@@ -49,5 +51,5 @@ export default function HomePage() {
         </Link>
       </div>
     </div>
-  )
+  );
 }

@@ -4,6 +4,9 @@ import { useState, useEffect, useMemo } from "react";
 import CountUp from "../components/CountUp";
 import TextScramble from "../components/TextScramble";
 import TerminalLog from "../components/TerminalLog";
+import GlitchNumber from "../components/GlitchNumber";
+import GlitchProgressBar from "../components/GlitchProgressBar";
+import GlitchIndustryItem from "../components/GlitchIndustryItem";
 import {
   LineChart,
   Line,
@@ -193,23 +196,23 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-terminal-bg text-terminal-text p-4 md:p-6">
+    <div className="min-h-screen bg-terminal-bg text-terminal-text p-3 sm:p-4 md:p-6">
       {/* CRT Scanline Overlay */}
       <div className="crt-overlay" />
 
       {/* Terminal Header */}
-      <header className="mb-8 border-b border-terminal-border pb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <span className="terminal-label">[ SYSTEM.STATUS ]</span>
-            <span className="text-terminal-success pulse-glow">● ONLINE</span>
+      <header className="mb-6 sm:mb-6 sm:mb-8 border-b border-terminal-border pb-3 sm:pb-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <span className="terminal-label text-xs sm:text-[0.75rem]">[ SYSTEM.STATUS ]</span>
+            <span className="text-terminal-success pulse-glow text-sm sm:text-base">● ONLINE</span>
           </div>
-          <div className="terminal-label">{currentTime}</div>
+          <div className="terminal-label text-xs sm:text-[0.75rem]">{currentTime}</div>
         </div>
       </header>
 
       {/* Hero Section - Terminal Command */}
-      <section className="mb-12 terminal-box p-6">
+      <section className="mb-6 sm:mb-12 terminal-box p-4 sm:p-6">
         <div className="command-line">
           <span className="command-prompt">$</span>
           <span className="command-text">{loading ? "Loading data..." : typewriterText}</span>
@@ -220,12 +223,12 @@ export default function DashboardPage() {
       {/* Error State */}
       {error && (
         <div
-          className="terminal-box p-6 mb-8"
+          className="terminal-box p-4 sm:p-6 mb-6 sm:mb-8"
           style={{ borderColor: "var(--terminal-warning)" }}
         >
           <div className="text-center">
             <div
-              className="terminal-label mb-4"
+              className="terminal-label mb-3 sm:mb-4"
               style={{ color: "var(--terminal-warning)" }}
             >
               {"> SYSTEM.ERROR"}
@@ -242,12 +245,12 @@ export default function DashboardPage() {
       )}
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8 sm:mb-12">
         {/* Left Column - Timeline */}
 
         <div className="lg:col-span-1">
-          <section className="terminal-box p-6 h-full">
-            <div className="terminal-label mb-6">{"> RESEARCH.JOURNEY"}</div>
+          <section className="terminal-box p-4 sm:p-6 h-full">
+            <div className="terminal-label mb-3 sm:mb-6">{"> RESEARCH.JOURNEY"}</div>
             <div className="timeline-container">
               <div className="timeline-line" />
               {timelineData.map((item, index) => (
@@ -261,9 +264,9 @@ export default function DashboardPage() {
                           : ""
                     }`}
                   />
-                  <div className="mb-4">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="font-bold text-terminal-text">
+                  <div className="mb-3 sm:mb-4">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+                      <span className="font-bold text-terminal-text text-sm sm:text-base">
                         {item.phase}
                       </span>
                       {item.status === "current" && (
@@ -273,8 +276,8 @@ export default function DashboardPage() {
                         </div>
                       )}
                     </div>
-                    <div className="terminal-label">{item.date}</div>
-                    <div className="text-terminal-muted mt-1">
+                    <div className="terminal-label text-xs sm:text-sm">{item.date}</div>
+                    <div className="text-terminal-muted mt-1 text-xs sm:text-sm">
                       {item.description}
                     </div>
                   </div>
@@ -287,7 +290,7 @@ export default function DashboardPage() {
         {/* Right Columns - Bento Grid Dashboard */}
         <div className="lg:col-span-2">
           {/* Metrics Row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-3 sm:mb-4 sm:mb-6">
             {[
               {
                 label: "Total Responses",
@@ -310,7 +313,7 @@ export default function DashboardPage() {
                 live: true,
               },
             ].map((metric, index) => (
-              <div key={index} className="terminal-box p-4">
+              <div key={index} className="terminal-box p-3 sm:p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="data-label">{metric.label}</div>
                   {metric.live && (
@@ -326,17 +329,17 @@ export default function DashboardPage() {
           </div>
 
           {/* Bento Grid */}
-          <div className="bento-grid bento-col-2">
+          <div className="bento-grid bento-col-2 gap-3 sm:gap-4">
             {/* Live Chart */}
-            <div className="terminal-box p-6 bento-span-2">
-              <div className="flex items-center justify-between mb-4">
+            <div className="terminal-box p-4 sm:p-6 bento-span-2">
+              <div className="flex items-center justify-between mb-3 sm:mb-3 sm:mb-4">
                 <div className="terminal-label">{"> DATA_STREAM"}</div>
                 <div className="live-badge">
                   <div className="live-dot"></div>
                   LIVE
                 </div>
               </div>
-              <div className="chart-container h-64">
+              <div className="chart-container h-36 sm:h-48 sm:h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={surveyData?.responseAccumulation || []}>
                     <defs>
@@ -354,11 +357,11 @@ export default function DashboardPage() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
                     <XAxis
                       dataKey="date"
-                      tick={{ fill: "#9CA3AF", fontSize: 10 }}
+                      tick={{ fill: "#9CA3AF", fontSize: 8 }}
                       axisLine={{ stroke: "#1F2937" }}
                     />
                     <YAxis
-                      tick={{ fill: "#9CA3AF", fontSize: 10 }}
+                      tick={{ fill: "#9CA3AF", fontSize: 8 }}
                       axisLine={{ stroke: "#1F2937" }}
                     />
                     <Tooltip
@@ -384,10 +387,10 @@ export default function DashboardPage() {
             </div>
 
             {/* Terminal Output Log */}
-            <div className="terminal-box p-6 bento-span-2">
-              <div className="terminal-label mb-4">{"> SYSTEM.LOG"}</div>
+            <div className="terminal-box p-4 sm:p-6 bento-span-2">
+              <div className="terminal-label mb-3 sm:mb-4">{"> SYSTEM.LOG"}</div>
               {loading ? (
-                <div className="font-mono text-sm text-terminal-muted">
+                <div className="font-mono text-xs sm:text-sm text-terminal-muted">
                   <span>Waiting</span>
                   <span className="cursor-blink">...</span>
                 </div>
@@ -397,35 +400,34 @@ export default function DashboardPage() {
             </div>
 
             {/* Additional Metric Card */}
-            <div className="terminal-box p-6">
-              <div className="terminal-label mb-4">{"> MODEL.STATUS"}</div>
+            <div className="terminal-box p-4 sm:p-6">
+              <div className="terminal-label mb-3 sm:mb-4">{"> MODEL.STATUS"}</div>
               <div className="space-y-4">
                 <div>
                   <div className="data-label mb-2">Survey Progress</div>
-                  <div className="w-full bg-terminal-border h-2">
-                    <div
-                      className="bg-terminal-accent h-full"
-                      style={{
-                        width: `${surveyData?.progressPercentage || 0}%`,
-                      }}
-                    ></div>
-                  </div>
-                  <div className="text-right terminal-label mt-1">
-                    {surveyData?.progressPercentage || 0}%
-                  </div>
+                  <GlitchProgressBar
+                    percentage={surveyData?.progressPercentage || 0}
+                    loading={loading}
+                    decimals={0}
+                  />
                 </div>
                 <div>
                   <div className="data-label mb-2">Responses Collected</div>
                   <div className="data-value text-xl text-terminal-success">
-                    {surveyData?.totalResponses || 0} / 150
+                    <GlitchNumber
+                      value={surveyData?.totalResponses || 0}
+                      loading={loading}
+                      decimals={0}
+                    />{" "}
+                    / 150
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Industry Distribution */}
-            <div className="terminal-box p-6">
-              <div className="terminal-label mb-4">
+            <div className="terminal-box p-4 sm:p-6">
+              <div className="terminal-label mb-3 sm:mb-4">
                 {"> INDUSTRY.BREAKDOWN"}
               </div>
               <div className="space-y-3">
@@ -437,20 +439,12 @@ export default function DashboardPage() {
                         )
                       : 0;
                     return (
-                      <div key={index}>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm">{item.label}</span>
-                          <span className="text-sm text-terminal-accent">
-                            {percentage}%
-                          </span>
-                        </div>
-                        <div className="w-full bg-terminal-border h-1">
-                          <div
-                            className="bg-terminal-accent h-full"
-                            style={{ width: `${percentage}%` }}
-                          ></div>
-                        </div>
-                      </div>
+                      <GlitchIndustryItem
+                        key={index}
+                        label={item.label}
+                        percentage={percentage}
+                        loading={loading}
+                      />
                     );
                   },
                 )}
@@ -458,25 +452,25 @@ export default function DashboardPage() {
             </div>
 
             {/* Frequency Distribution */}
-            <div className="terminal-box p-6 bento-span-2">
-              <div className="flex items-center justify-between mb-4">
+            <div className="terminal-box p-4 sm:p-6 bento-span-2">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <div className="terminal-label">{"> USAGE.FREQUENCY"}</div>
                 <div className="live-badge">
                   <div className="live-dot"></div>
                   LIVE
                 </div>
               </div>
-              <div className="chart-container h-64">
+              <div className="chart-container h-36 sm:h-48 sm:h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={surveyData?.frequencyDistribution || []}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
                     <XAxis
                       dataKey="label"
-                      tick={{ fill: "#9CA3AF", fontSize: 10 }}
+                      tick={{ fill: "#9CA3AF", fontSize: 8 }}
                       axisLine={{ stroke: "#1F2937" }}
                     />
                     <YAxis
-                      tick={{ fill: "#9CA3AF", fontSize: 10 }}
+                      tick={{ fill: "#9CA3AF", fontSize: 8 }}
                       axisLine={{ stroke: "#1F2937" }}
                     />
                     <Tooltip
@@ -494,15 +488,15 @@ export default function DashboardPage() {
             </div>
 
             {/* Duration Distribution */}
-            <div className="terminal-box p-6 bento-span-2">
-              <div className="flex items-center justify-between mb-4">
+            <div className="terminal-box p-4 sm:p-6 bento-span-2">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <div className="terminal-label">{"> USAGE.DURATION"}</div>
                 <div className="live-badge">
                   <div className="live-dot"></div>
                   LIVE
                 </div>
               </div>
-              <div className="chart-container h-64">
+              <div className="chart-container h-36 sm:h-48 sm:h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={surveyData?.durationDistribution || []}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
@@ -512,7 +506,7 @@ export default function DashboardPage() {
                       axisLine={{ stroke: "#1F2937" }}
                     />
                     <YAxis
-                      tick={{ fill: "#9CA3AF", fontSize: 10 }}
+                      tick={{ fill: "#9CA3AF", fontSize: 8 }}
                       axisLine={{ stroke: "#1F2937" }}
                     />
                     <Tooltip
@@ -530,9 +524,9 @@ export default function DashboardPage() {
             </div>
 
             {/* Tools Popularity */}
-            <div className="terminal-box p-6 bento-span-2">
-              <div className="terminal-label mb-4">{"> TOOLS.POPULARITY"}</div>
-              <div className="chart-container h-48">
+            <div className="terminal-box p-4 sm:p-6 bento-span-2">
+              <div className="terminal-label mb-3 sm:mb-4">{"> TOOLS.POPULARITY"}</div>
+              <div className="chart-container h-36 sm:h-48">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={surveyData?.toolsDistribution || []}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
@@ -542,7 +536,7 @@ export default function DashboardPage() {
                       axisLine={{ stroke: "#1F2937" }}
                     />
                     <YAxis
-                      tick={{ fill: "#9CA3AF", fontSize: 10 }}
+                      tick={{ fill: "#9CA3AF", fontSize: 8 }}
                       axisLine={{ stroke: "#1F2937" }}
                     />
                     <Tooltip
@@ -563,7 +557,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Footer Command Line */}
-      <footer className="terminal-box p-4">
+      <footer className="terminal-box p-3 sm:p-4">
         <div className="command-line">
           <span className="command-prompt">$</span>
           <span className="command-text">awaiting_next_command...</span>
