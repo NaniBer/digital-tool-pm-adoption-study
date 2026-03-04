@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import CountUp from "../components/CountUp";
 import {
   LineChart,
@@ -125,6 +125,21 @@ export default function DashboardPage() {
   const [surveyData, setSurveyData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [displayCount, setDisplayCount] = useState<number | null>(null);
+
+  // Generate a random target count for initial loading animation
+  const randomTarget = useMemo(() => Math.floor(Math.random() * 100) + 50, []);
+
+  // Update display count when loading state changes
+  useEffect(() => {
+    if (loading && displayCount === null) {
+      // Set random target on first render
+      setDisplayCount(randomTarget);
+    } else if (!loading && surveyData) {
+      // Smoothly update to real value when data loads
+      setDisplayCount(surveyData.totalResponses);
+    }
+  }, [loading, surveyData, randomTarget, displayCount]);
 
   useEffect(() => {
     const updateTime = () => {
@@ -287,7 +302,7 @@ export default function DashboardPage() {
             {[
               {
                 label: "Total Responses",
-                value: <CountUp to={surveyData?.totalResponses || 0} onStart={() => {}} onEnd={() => {}} />,
+                value: displayCount !== null ? <CountUp to={displayCount} onStart={() => {}} onEnd={() => {}} /> : "-",
                 live: false,
               },
               {
