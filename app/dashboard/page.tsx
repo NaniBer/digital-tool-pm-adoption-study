@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import CountUp from "../components/CountUp";
 import TextScramble from "../components/TextScramble";
+import TerminalLog from "../components/TerminalLog";
 import {
   LineChart,
   Line,
@@ -385,25 +386,14 @@ export default function DashboardPage() {
             {/* Terminal Output Log */}
             <div className="terminal-box p-6 bento-span-2">
               <div className="terminal-label mb-4">{"> SYSTEM.LOG"}</div>
-              <div className="space-y-2 font-mono text-sm max-h-64 overflow-y-auto">
-                {logData.map((log, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <span className="text-terminal-muted">[{log.time}]</span>
-                    <span
-                      className={
-                        log.type === "success"
-                          ? "text-terminal-success"
-                          : log.type === "warning"
-                            ? "text-terminal-warning"
-                            : "text-terminal-accent"
-                      }
-                    >
-                      {log.type.toUpperCase()}:
-                    </span>
-                    <span className="text-terminal-muted">{log.message}</span>
-                  </div>
-                ))}
-              </div>
+              {loading ? (
+                <div className="font-mono text-sm text-terminal-muted">
+                  <span>Waiting</span>
+                  <span className="cursor-blink">...</span>
+                </div>
+              ) : (
+                <TerminalLog logs={logData} typingSpeed={20} lineDelay={100} />
+              )}
             </div>
 
             {/* Additional Metric Card */}
