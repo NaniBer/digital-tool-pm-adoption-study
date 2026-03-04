@@ -114,8 +114,15 @@ export interface SurveyData {
   durationDistribution: DistributionItem[]
   /** Popularity distribution of tools mentioned in responses */
   toolsDistribution: DistributionItem[]
+  /** Response accumulation over time (cumulative total responses) */
+  responseAccumulation: ResponseAccumulation[]
   /** Average usefulness rating (1-5 scale) from all non-zero responses */
   averageUsefulness: number
   /** Total number of valid survey responses processed */
   totalResponses: number
+}
+
+export interface ResponseAccumulation {
+  date: string
+  count: number
 }
