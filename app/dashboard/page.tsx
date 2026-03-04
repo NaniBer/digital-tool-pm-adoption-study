@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import CountUp from "../components/CountUp";
 import {
   LineChart,
   Line,
@@ -239,6 +240,7 @@ export default function DashboardPage() {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
         {/* Left Column - Timeline */}
+
         <div className="lg:col-span-1">
           <section className="terminal-box p-6 h-full">
             <div className="terminal-label mb-6">{"> RESEARCH.JOURNEY"}</div>
@@ -285,7 +287,7 @@ export default function DashboardPage() {
             {[
               {
                 label: "Total Responses",
-                value: surveyData?.totalResponses?.toLocaleString() || "-",
+                value: <CountUp to={surveyData?.totalResponses || 0} onStart={() => {}} onEnd={() => {}} />,
                 live: false,
               },
               {
