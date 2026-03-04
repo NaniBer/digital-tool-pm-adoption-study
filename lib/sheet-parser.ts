@@ -36,8 +36,8 @@ function parseCSV(csvText: string): SurveyResponse[] {
     const line = lines[i].trim()
     if (!line || line === '') continue
 
-    const row = line.split(',')
-    if (row.length < 11) continue
+    const row = parseCSVRow(line)
+    if (row.length < 12) continue
 
     const usefulness = parseInt(row[11].trim(), 10)
     if (isNaN(usefulness)) continue
@@ -59,6 +59,34 @@ function parseCSV(csvText: string): SurveyResponse[] {
   }
 
   return responses
+}
+
+/**
+ * Parse a CSV row, handling quoted fields that may contain commas
+ * Example: "Trello, Jira, ClickUp" should be treated as a single field
+ */
+function parseCSVRow(line: string): string[] {
+  const result: string[] = []
+  let currentField = ''
+  let inQuotes = false
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i]
+
+    if (char === '"') {
+      inQuotes = !inQuotes
+    } else if (char === ',' && !inQuotes) {
+      result.push(currentField)
+      currentField = ''
+    } else {
+      currentField += char
+    }
+  }
+
+  // Push the last field
+  result.push(currentField)
+
+  return result
 }
 
 function aggregateData(responses: SurveyResponse[]): SurveyData {
@@ -100,29 +128,30 @@ function aggregateData(responses: SurveyResponse[]): SurveyData {
 }
 
 function computeResponseAccumulation(responses: SurveyResponse[]): ResponseAccumulation[] {
-  // Group responses by month (format: "M/YYYY")
-  const monthMap = new Map<string, number>()
+  // Group responses by day (format: "M/D/YYYY")
+  const dayMap = new Map<string, number>()
 
   responses.forEach((response) => {
     const date = parseTimestamp(response.timestamp)
-    const monthKey = `${date.getMonth() + 1}/${date.getFullYear()}`
-    const count = monthMap.get(monthKey) || 0
-    monthMap.set(monthKey, count + 1)
+    const dayKey = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`
+    const count = dayMap.get(dayKey) || 0
+    dayMap.set(dayKey, count + 1)
   })
 
   // Sort chronologically and compute cumulative count
-  const sortedMonths = Array.from(monthMap.entries()).sort((a, b) => {
-    const [monthA, yearA] = a[0].split('/').map(Number)
-    const [monthB, yearB] = b[0].split('/').map(Number)
-    return yearA !== yearB ? yearA - yearB : monthA - monthB
+  const sortedDays = Array.from(dayMap.entries()).sort((a, b) => {
+    const [monthA, dayA, yearA] = a[0].split('/').map(Number)
+    const [monthB, dayB, yearB] = b[0].split('/').map(Number)
+    return yearA !== yearB ? yearA - yearB :
+           monthA !== monthB ? monthA - monthB : dayA - dayB
   })
 
   let cumulative = 0
   const result: ResponseAccumulation[] = []
 
-  sortedMonths.forEach(([month, count]) => {
+  sortedDays.forEach(([day, count]) => {
     cumulative += count
-    result.push({ date: month, count: cumulative })
+    result.push({ date: day, count: cumulative })
   })
 
   return result

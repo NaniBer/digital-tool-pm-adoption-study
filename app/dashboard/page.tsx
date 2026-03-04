@@ -16,17 +16,6 @@ const timelineData = [
   { phase: 'Publication', status: 'pending', date: 'Pending', description: 'Final review scheduled' },
 ]
 
-const adoptionTrendData = [
-  { month: 'Jan', value: 42 },
-  { month: 'Feb', value: 48 },
-  { month: 'Mar', value: 55 },
-  { month: 'Apr', value: 62 },
-  { month: 'May', value: 68 },
-  { month: 'Jun', value: 79 },
-  { month: 'Jul', value: 85 },
-  { month: 'Aug', value: 87 },
-]
-
 
 const logData = [
   { time: '14:32:01', type: 'info', message: 'Data stream initialized' },
@@ -232,7 +221,7 @@ export default function DashboardPage() {
               </div>
               <div className="chart-container h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={adoptionTrendData}>
+                  <AreaChart data={surveyData?.responseAccumulation || []}>
                     <defs>
                       <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="rgba(0, 240, 255, 0.3)" />
@@ -241,7 +230,7 @@ export default function DashboardPage() {
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
                     <XAxis
-                      dataKey="month"
+                      dataKey="date"
                       tick={{ fill: '#9CA3AF', fontSize: 10 }}
                       axisLine={{ stroke: '#1F2937' }}
                     />
@@ -259,7 +248,7 @@ export default function DashboardPage() {
                     />
                     <Area
                       type="monotone"
-                      dataKey="value"
+                      dataKey="count"
                       stroke="#00F0FF"
                       strokeWidth={2}
                       fillOpacity={1}
