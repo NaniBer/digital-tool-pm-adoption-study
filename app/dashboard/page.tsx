@@ -403,12 +403,19 @@ export default function DashboardPage() {
               <div className="terminal-label mb-4">{'> TOOLS.POPULARITY'}</div>
               <div className="chart-container h-48">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={surveyData?.toolsDistribution || []} layout="horizontal">
+                  <BarChart data={surveyData?.toolsDistribution || []}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
-                    <XAxis type="number" tick={{ fill: '#9CA3AF', fontSize: 10 }} axisLine={{ stroke: '#1F2937' }} />
-                    <YAxis dataKey="label" type="category" tick={{ fill: '#9CA3AF', fontSize: 9 }} axisLine={{ stroke: '#1F2937' }} width={70} />
+                    <XAxis
+                      dataKey="label"
+                      tick={{ fill: '#9CA3AF', fontSize: 8 }}
+                      axisLine={{ stroke: '#1F2937' }}
+                    />
+                    <YAxis
+                      tick={{ fill: '#9CA3AF', fontSize: 10 }}
+                      axisLine={{ stroke: '#1F2937' }}
+                    />
                     <Tooltip contentStyle={{ backgroundColor: '#111827', border: '1px solid #00F0FF', borderRadius: '0', color: '#FFFFFF' }} />
-                    <Bar dataKey="count" fill="#FF5500" radius={[0, 4, 4, 0]} />
+                    <Bar dataKey="count" fill="#FF5500" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
