@@ -3,6 +3,7 @@ import {
   DistributionItem,
   SurveyData,
   ResponseAccumulation,
+  SURVEY_GOAL,
   AgeRange,
   Gender,
   EducationLevel,
@@ -131,8 +132,21 @@ function aggregateData(responses: SurveyResponse[]): SurveyData {
     toolsDistribution: mapToDistributionArray(toolsMap).sort((a, b) => b.count - a.count),
     sectorDistribution: mapToDistributionArray(sectorMap).sort((a, b) => b.count - a.count),
     responseAccumulation: computeResponseAccumulation(responses),
+    progressPercentage: Math.min(Math.round((responses.length / SURVEY_GOAL) * 100), 100),
+    dataQualityMessage: getDataQualityMessage(responses.length),
+    latestResponseDate: responses.length > 0 ? responses[0].timestamp : '',
     averageUsefulness: usefulCount > 0 ? totalUsefulness / usefulCount : 0,
     totalResponses: responses.length,
+  }
+}
+
+function getDataQualityMessage(count: number): string {
+  if (count < 50) {
+    return 'Need more data'
+  } else if (count < 100) {
+    return 'Growing sample'
+  } else {
+    return 'Adequate sample'
   }
 }
 

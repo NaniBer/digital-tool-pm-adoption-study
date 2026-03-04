@@ -77,6 +77,11 @@ export type UsageDuration =
   | 'More than 5 years'
 
 /**
+ * Target number of survey responses for data collection
+ */
+export const SURVEY_GOAL = 150
+
+/**
  * A single survey response from the Google Sheet data
  */
 export interface SurveyResponse {
@@ -118,6 +123,12 @@ export interface SurveyData {
   sectorDistribution: DistributionItem[]
   /** Response accumulation over time (cumulative total responses) */
   responseAccumulation: ResponseAccumulation[]
+  /** Progress percentage toward survey goal (0-100) */
+  progressPercentage: number
+  /** Data quality assessment message */
+  dataQualityMessage: string
+  /** Latest response timestamp */
+  latestResponseDate: string
   /** Average usefulness rating (1-5 scale) from all non-zero responses */
   averageUsefulness: number
   /** Total number of valid survey responses processed */
