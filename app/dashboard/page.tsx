@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import CountUp from "../components/CountUp";
+import TextScramble from "../components/TextScramble";
 import {
   LineChart,
   Line,
@@ -210,23 +211,10 @@ export default function DashboardPage() {
       <section className="mb-12 terminal-box p-6">
         <div className="command-line">
           <span className="command-prompt">$</span>
-          <span className="command-text">{typewriterText}</span>
+          <span className="command-text">{loading ? "Loading data..." : typewriterText}</span>
           <span className="cursor-blink">_</span>
         </div>
       </section>
-
-      {/* Loading State */}
-      {loading && (
-        <div className="terminal-box p-6 mb-8">
-          <div className="text-center">
-            <div className="terminal-label mb-4">{"> SYSTEM.STATUS"}</div>
-            <div className="flex items-center justify-center gap-2">
-              <span className="text-terminal-accent">Loading data...</span>
-              <span className="cursor-blink">_</span>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Error State */}
       {error && (
@@ -312,12 +300,12 @@ export default function DashboardPage() {
               },
               {
                 label: "Status",
-                value: loading ? "Loading..." : error ? "Error" : "Active",
+                value: <TextScramble text={error ? "ERROR" : "ACTIVE"} isActive={true} loading={loading && !error} />,
                 live: !loading && !error,
               },
               {
                 label: "Data Source",
-                value: "Live",
+                value: <TextScramble text="LIVE" isActive={true} loading={loading} />,
                 live: true,
               },
             ].map((metric, index) => (
