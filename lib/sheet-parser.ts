@@ -15,7 +15,8 @@ import {
   UsageDuration,
 } from './types'
 
-const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1D57oGe6ACimVBU7TRkXuhY_-fgVrB9HV_8QaC_m8W5g/export?format=csv'
+const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1IKZWi_Srt3-bu7UXZruH0J7MlaLwtv8r2PYrQ8trFms/export?format=csv'
+
 
 export async function fetchSurveyData(): Promise<SurveyData> {
   const response = await fetch(GOOGLE_SHEET_URL)
